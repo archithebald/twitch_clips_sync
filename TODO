@@ -1,0 +1,5 @@
+[] - Get all best clips from twitch from 7 last days from french streamers
+[] - Save them to a database to collection "clips" 
+[] - When using them add to a collection "used_clips" and register their id so to not use it anymore
+[] - Get 3 clips from different categories and sync them together and add a random music from the database, collection "musics"
+[] - Post one video a day on tiktok
