@@ -29,7 +29,7 @@ def get_access_token():
     
 access_token = get_access_token()
 
-def get_clips(start_date: str, end_date: str, streamer_id: str = "", game_id: str = ""):
+def get_clips_url(start_date: str, end_date: str, streamer_id: str = "", game_id: str = ""):
     url = f"https://api.twitch.tv/helix/clips?broadcaster_id={streamer_id}&started_at={start_date}&ended_at={end_date}"
     
     headers = {
@@ -39,7 +39,14 @@ def get_clips(start_date: str, end_date: str, streamer_id: str = "", game_id: st
     
     res = requests.get(url=url, headers=headers)
     
-    return res.json()["data"]
+    data = res.json()["data"]
+
+    clips = []
+
+    for clip in data:
+        clips.append(clip["url"])
+        
+    return clips
 
 def get_streamer_id(channel_name: str):
     url = f"https://api.twitch.tv/helix/users?login={channel_name}"
@@ -53,6 +60,8 @@ def get_streamer_id(channel_name: str):
     
     return res.json()["data"][0]["id"]
 
-ide = get_streamer_id("gotaga")
+ide = get_streamer_id("fugu_fps")
 
-print(get_clips(streamer_id=ide, start_date=get_start_date(), end_date=get_end_date()))
+urls = get_clips_url(streamer_id=ide, start_date=get_start_date(), end_date=get_end_date())
+
+print(urls)
