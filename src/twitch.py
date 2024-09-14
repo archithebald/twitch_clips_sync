@@ -1,6 +1,7 @@
 import requests
 import os
 
+from database import *
 from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
@@ -44,7 +45,7 @@ def get_clips_url(start_date: str, end_date: str, streamer_id: str = "", game_id
     clips = []
 
     for clip in data:
-        clips.append(clip["url"])
+        clips.append({"url": clip["url"],"title":clip["title"],"streamer":clip["broadcaster_name"]})
         
     return clips
 
@@ -60,8 +61,3 @@ def get_streamer_id(channel_name: str):
     
     return res.json()["data"][0]["id"]
 
-ide = get_streamer_id("fugu_fps")
-
-urls = get_clips_url(streamer_id=ide, start_date=get_start_date(), end_date=get_end_date())
-
-print(urls)
