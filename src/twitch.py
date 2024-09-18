@@ -1,5 +1,7 @@
 import requests
 import os
+import ffmpeg
+import urllib
 
 from database import *
 from datetime import datetime, timedelta
@@ -61,3 +63,23 @@ def get_streamer_id(channel_name: str):
     
     return res.json()["data"][0]["id"]
 
+def download_clip(clip_url: str, clip_name: str, path: str):
+    ### https://production.assets.clips.twitchcdn.net/v2/media/<id>/video.mp4?sig=<sig>&token=<token>
+    
+    headers = {
+        "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36 OPR/113.0.0.0",
+    }
+    
+    clip_id = clip_url.split("/")[-1]
+    
+    url = f"https://cy49zmt23f.execute-api.us-east-1.amazonaws.com/dev/download_clip?id={clip_id}"
+    
+    res = requests.get(url=url, headers=headers).json()
+    
+    video_url = res["data"][0]["video_url"]
+    
+    clip_name += ".mp4"
+
+    urllib.request.urlretrieve(video_url, path+clip_name) 
+        
+download_clip("https://clips.twitch.tv/ClearBlueCodTooSpicy-KomFytNIyldPYfH_", "helydia", "C:\\Users\\Salmen\\Desktop\\Python Projects\\AutomaticTiktokClips\\src\\")
