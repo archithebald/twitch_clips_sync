@@ -1,6 +1,5 @@
 import requests
 import os
-import ffmpeg
 import urllib
 
 from database import *
@@ -81,5 +80,3 @@ def download_clip(clip_url: str, clip_name: str, path: str):
     clip_name += ".mp4"
 
     urllib.request.urlretrieve(video_url, path+clip_name) 
-        
-download_clip("https://clips.twitch.tv/ClearBlueCodTooSpicy-KomFytNIyldPYfH_", "helydia", "C:\\Users\\Salmen\\Desktop\\Python Projects\\AutomaticTiktokClips\\src\\")
