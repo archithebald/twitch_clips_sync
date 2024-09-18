@@ -10,7 +10,9 @@ def main():
         
         add_clips(clips=clips)
 
-        clips_to_use = get_random_clip(number=4)
+        clips_to_use = get_random_clips(1)
+        
+        
         
 if __name__ == "__main__":
     main()
