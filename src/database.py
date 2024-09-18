@@ -11,13 +11,25 @@ DB_NAME = "twitch_clips"
 DATABASE = pymongo.database.Database(client=CLIENT, name=DB_NAME)
 
 clips_collection = DATABASE.get_collection(name="clips")
+used_clips_collection = DATABASE.get_collection(name="used_clips")
 musics = DATABASE.get_collection(name="musics")
 streamers_collection = DATABASE.get_collection(name="streamers")
 
 def add_clips(clips: list = []):
     for clip in clips:
-        if not clips_collection.find_one({"url": clip["url"]}):
+        if clips_collection.find_one({"url": clip["url"]}) == None and not find_used_clip(clip=clip):
             clips_collection.insert_one({"url": clip["url"], "title": clip["title"], "streamer": clip["streamer"]})
+
+def add_used_clips(clips: list = []):
+    for clip in clips:
+        if used_clips_collection.find_one({"url": clip["url"]}) == None:
+            used_clips_collection.insert_one({"url": clip["url"], "title": clip["title"], "streamer": clip["streamer"]})
+
+def find_used_clip(clip):
+    if used_clips_collection.find_one({"url": clip.get("url")}):
+        return True
+    else:
+        return False
 
 def add_streamer(streamer: str):
     streamers_collection.insert_one({"name": streamer})
@@ -28,14 +40,13 @@ def reset_streamers():
 def get_random_streamer(number: int):
     s = []
     
-    for _ in range(number):
-        streamers = streamers_collection.aggregate([{"$sample": {"size": 3}}])
+    streamers = streamers_collection.aggregate([{"$sample": {"size": number}}])
         
-        for streamer in streamers:
-            name = streamer.get("name")
+    for streamer in streamers:
+        name = streamer.get("name")
             
-            if name not in s:
-                s.append(name)
+        if name not in s:
+            s.append(name)
             
     return s
 
@@ -43,20 +54,22 @@ def get_random_music():
     return musics.find_one()
 
 def remove_clip(clip):
-    clips_collection.delete_one({"url": clip["url"]})
+    if clips_collection.find_one({"url": clip.get("url")}) != None:
+        clips_collection.delete_one({"url": clip.get("url")})
+        add_used_clips([clip])
 
-def get_random_clip(number: int):
-    clips = []
+def get_random_clips(number: int):
+    clips_table = []
     
-    for _ in range(number):
-        clip = clips_collection.find_one()
+    clips = clips_collection.aggregate([{"$sample": {"size": number}}])
         
-        if clip not in clips:
-            clips.append(clip)
+    for clip in clips:
+        if clip not in clips_table:
+            clips_table.append(clip)
             
             remove_clip(clip=clip)
             
-    return clips
+    return clips_table
 
 def get_trending_streamers():
     streamers = []
